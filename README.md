@@ -1,1 +1,0 @@
-# Avtorisation-by-html-js-not-safe-

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Авторизация</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; margin: 0; }
+        .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 300px; text-align: center; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        #error { color: red; font-size: 14px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Вход</h2>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Логин" required>
+            <input type="password" id="password" placeholder="Пароль" required>
+            <button type="submit">Войти</button>
+        </form>
+        <div id="error"></div>
+    </div>
+
+    <script src="settings.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+
+            if (user === 'админ' && pass === '123') {
+                localStorage.clear(); // Полная очистка при успехе
+                localStorage.setItem('isLogged', 'true');
+                window.location.href = 'profile.html';
+            } else {
+                let attempts = parseInt(localStorage.getItem('attempts') || 0) + 1;
+                localStorage.setItem('attempts', attempts);
+
+                if (attempts >= 3) {
+                    const now = Date.now();
+                    const lastBlock = parseInt(localStorage.getItem('lastBlockTime') || 0);
+                    const dayInMs = 24 * 60 * 60 * 1000; // 24 часа в мс
+
+                    let currentPenalty = parseInt(localStorage.getItem('penaltyMinutes') || 0);
+
+                    // СБРОС: Если прошло больше 24 часов с последней блокировки, сбрасываем штраф до 0
+                    if (now - lastBlock > dayInMs) {
+                        currentPenalty = 0;
+                    }
+
+                    // Увеличиваем штраф на 10 минут
+                    currentPenalty += 10;
+                    
+                    localStorage.setItem('penaltyMinutes', currentPenalty);
+                    localStorage.setItem('lastBlockTime', now);
+                    localStorage.setItem('blockUntil', now + (currentPenalty * 60 * 1000));
+                    localStorage.setItem('attempts', 0);
+                    
+                    window.location.href = 'blocked.html';
+                } else {
+                    document.getElementById('error').innerText = `Неправильные логин или пароль. Осталось попыток: ${3 - attempts}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

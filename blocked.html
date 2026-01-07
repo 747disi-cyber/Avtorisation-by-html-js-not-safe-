@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Доступ заблокирован</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background: #fff0f0; margin: 0; }
+        h1 { color: #cc0000; margin-bottom: 10px; }
+        #timer { font-size: 24px; font-weight: bold; color: #333; }
+    </style>
+</head>
+<body>
+    <h1>ДОСТУП ЗАБЛОКИРОВАН</h1>
+    <p>Повторная попытка будет возможна через:</p>
+    <div id="timer">--:--</div>
+
+    <script>
+        function updateTimer() {
+            const blockUntil = parseInt(localStorage.getItem('blockUntil'));
+            const now = Date.now();
+            const timeLeft = blockUntil - now;
+
+            if (timeLeft <= 0) {
+                localStorage.removeItem('blockUntil');
+                window.location.href = 'avtorisation.html';
+                return;
+            }
+
+            const minutes = Math.floor(timeLeft / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+            
+            document.getElementById('timer').innerText = 
+                `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+
+        // Запускаем таймер сразу и обновляем каждую секунду
+        updateTimer();
+        setInterval(updateTimer, 1000);
+    </script>
+</body>
+</html>

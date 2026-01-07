@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ДОСТУП ЗАБЛОКИРОВАН</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background: #fff0f0; margin: 0; }
+        h1 { color: #cc0000; }
+        #timer { font-size: 2.5rem; font-weight: bold; color: #333; }
+        .info { color: #666; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>ДОСТУП ЗАБЛОКИРОВАН</h1>
+    <div id="timer">--:--:--</div>
+    <p class="info">Лимит попыток исчерпан. Попробуйте позже.</p>
+
+    <script>
+        function update() {
+            const until = parseInt(localStorage.getItem('blockUntil'));
+            const diff = until - Date.now();
+
+            if (diff <= 0) {
+                localStorage.removeItem('blockUntil');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+
+            // Формат ЧЧ:ММ:СС
+            const displayH = h > 0 ? h + ':' : '';
+            const displayM = (m < 10 ? '0' : '') + m;
+            const displayS = (s < 10 ? '0' : '') + s;
+            
+            document.getElementById('timer').innerText = `${displayH}${displayM}:${displayS}`;
+        }
+        setInterval(update, 1000);
+        update();
+    </script>
+</body>
+</html>
